@@ -7,6 +7,7 @@
  */
 
 plugins {
+    id("org.jetbrains.dokka") version "1.9.0"
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
 
@@ -22,6 +23,9 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
+    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
 }
 
 testing {
