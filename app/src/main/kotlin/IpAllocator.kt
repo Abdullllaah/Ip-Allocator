@@ -38,6 +38,7 @@ object IpAllocator {
      * @return [IpInformation] Including the secured ip and the port will be 0
      * @throws [IllegalArgumentException] If there is no remaining address
      */
+    @Suppress("NestedBlockDepth")
     private fun assignSequentialIp(targetTypeInfo: TargetTypeInfo): IpInformation {
         logger.debug { "Assigning sequential ip" }
         for (segment in targetTypeInfo.segments) {
