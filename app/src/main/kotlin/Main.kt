@@ -74,7 +74,15 @@ fun main() {
 
 //    Registry.securePort(IpInformation("20.20.200.9", 0u))
 
-//    val result = dsl.selectFrom(SERVICES).fetch()
-//    println(result)
+    Registry.secureIp(TargetType(ClientTargetType.CLIENT))
+    var result = dsl.selectFrom(CLIENTS_INFO).fetch()
+    println(result)
+    var res = dsl.selectFrom(CLIENTS_IPS).fetch()
+    println(res)
+    println(Admin.freeExpiredIps())
+    result = dsl.selectFrom(CLIENTS_INFO).fetch()
+    println(result)
+    res = dsl.selectFrom(CLIENTS_IPS).fetch()
+    println(res)
 }
 

@@ -34,4 +34,19 @@ object Admin {
             }
         }
     }
+
+    fun freeExpiredIps() {
+        logger.info { "Freeing expired IPs" }
+        val expiredClientIps = dsl.update(CLIENTS_IPS)
+            .set(CLIENTS_IPS.PORT, 0)
+            .set(CLIENTS_IPS.ALLOCATED, false)
+            .set(CLIENTS_IPS.DATE, null as String?)
+            .where(CLIENTS_IPS.DATE.isNotNull)
+            .returningResult()
+            .fetch(CLIENTS_IPS.IP)
+
+        dsl.deleteFrom(CLIENTS_INFO)
+            .where(CLIENTS_INFO.IP.`in`(expiredClientIps))
+            .execute()
+    }
 }
