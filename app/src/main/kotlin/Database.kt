@@ -3,7 +3,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 object Database {
-    private const val DB_URL = "jdbc:sqlite:my_database.db"
+    private const val DB_URL = "jdbc:sqlite:app/my_database.db"
 
     fun connect(): Connection? {
         return try {

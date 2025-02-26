@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: changelog/changes/001_initial_schema.yaml
+  - include:
+      file: changelog/changes/002_add_clients_tables.yaml

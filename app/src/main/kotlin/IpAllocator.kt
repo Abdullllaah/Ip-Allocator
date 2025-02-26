@@ -1,10 +1,21 @@
+import ClientTargetType.CLIENT
+import ClientTargetType.SERVER
 import IpAllocator.IpAllocationType.RANDOM
 import IpAllocator.IpAllocationType.SEQUENTIAL
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jooq.impl.DSL
+import java.sql.DriverManager
 import kotlin.random.Random
+import jooq.generated.tables.references.*
+import org.jooq.impl.DSL.currentTimestamp
+import java.lang.IllegalStateException
+import java.sql.Timestamp
 
 /** Handles ip address allocations */
 object IpAllocator {
+    private val connection = DriverManager.getConnection("jdbc:sqlite:app/my_database.db")
+    private val dsl = DSL.using(connection)
+
     enum class IpAllocationType {
         SEQUENTIAL,
         RANDOM
@@ -23,12 +34,47 @@ object IpAllocator {
      * @param targetTypeInfo An object that contains list and segment based on the user type from [DB]
      * @return [IpInformation] Including the secured ip and the port will be 0
      */
-    fun assignIp(allocationType: IpAllocationType, targetTypeInfo: TargetTypeInfo): IpInformation {
-        logger.info { "Attempting to assign ip to $allocationType" }
-        return when (allocationType) {
-            SEQUENTIAL -> assignSequentialIp(targetTypeInfo)
-            RANDOM -> assignRandomIp(targetTypeInfo)
+    fun assignIp(allocationType: IpAllocationType, targetTypeInfo: TargetTypeInfo): IpInformation { // Client must connect to a server?
+        logger.info { "Attempting to assign ip to ${targetTypeInfo.targetType.ipPortTarget} type" }
+        val table = when (targetTypeInfo.targetType.ipPortTarget) {
+            SERVER -> SERVERS_IPS
+            CLIENT -> CLIENTS_IPS
         }
+
+        val record = dsl.select(table.field("ip"))
+            .from(table)
+            .where(table.field("allocated", Boolean::class.java)?.eq(false))
+            .limit(1)
+            .fetchOne()
+
+        if (record == null) {
+            throw IllegalStateException("No available IPs")
+        }
+
+        val ip = record.get(table.field("ip")).toString()
+
+        dsl.update(table)
+            .set(table.field("allocated", Boolean::class.java), true)
+            .set(table.field("date", Timestamp::class.java), currentTimestamp())
+            .where(table.field("ip", String::class.java)?.eq(ip))
+            .execute()
+
+       when (targetTypeInfo.targetType.ipPortTarget) {
+           SERVER ->
+               dsl.insertInto(SERVERS, SERVERS.IP)
+                   .values(ip)
+                   .execute()
+           CLIENT ->
+               dsl.insertInto(CLIENTS_INFO, CLIENTS_INFO.IP)
+                   .values(ip)
+                   .execute()
+       }
+
+        return IpInformation(ip, 0u)
+//        return when (allocationType) {
+//            SEQUENTIAL -> assignSequentialIp(targetTypeInfo)
+//            RANDOM -> assignRandomIp(targetTypeInfo)
+//        }
     }
 
     /**

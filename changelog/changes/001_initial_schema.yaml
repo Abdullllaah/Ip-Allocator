@@ -1,0 +1,97 @@
+databaseChangeLog:
+  - changeSet:
+      id: initial-schema
+      author: abdullah
+      changes:
+        - createTable:
+            tableName: config
+            columns:
+              - column:
+                  name: life_time_sec
+                  type: int
+
+        - createTable:
+            tableName: servers_ips
+            columns:
+              - column:
+                  name: ip
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: allocated
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: date
+                  type: timestamp
+                  constraints:
+                    nullable: true
+
+        - createTable:
+            tableName: servers
+            columns:
+              - column:
+                  name: ip
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+
+#        - addForeignKeyConstraint:
+#            baseTableName: servers
+#            baseColumnNames: ip
+#            referencedTableName: servers_ips
+#            referencedColumnNames: ip
+#            constraintName: fk__servers__servers_ips
+
+        - createTable:
+            tableName: services
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: port
+                  type: int
+              - column:
+                  name: ip
+                  type: varchar(255)
+
+#        - addForeignKeyConstraint:
+#            baseTableName: services
+#            baseColumnNames: ip
+#            referencedTableName: servers
+#            referencedColumnNames: ip
+#            constraintName: fk__services__servers
+
+        - createTable:
+            tableName: servers_services
+            columns:
+              - column:
+                  name: server_ip
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: service_id
+                  type: int
+                  constraints:
+                    primaryKey: true
+
+#        - addForeignKeyConstraint:
+#            baseTableName: servers_services
+#            baseColumnNames: server_ip
+#            referencedTableName: servers
+#            referencedColumnNames: ip
+#            constraintName: fk__servers_services__servers
+#
+#        - addForeignKeyConstraint:
+#            baseTableName: servers_services
+#            baseColumnNames: service_id
+#            referencedTableName: services
+#            referencedColumnNames: id
+#            constraintName: fk__servers_services__services
+

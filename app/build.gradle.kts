@@ -10,6 +10,8 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("com.ncorti.ktfmt.gradle") version "0.21.0"
+    id("org.liquibase.gradle") version "2.2.2"
+    id("nu.studer.jooq") version "9.0"
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
 
@@ -33,13 +35,61 @@ detekt {
     baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
 }
 
+liquibase {
+    activities {
+        create("main") {
+            arguments = mapOf(
+                "changelogFile" to "changelog/changelog.yaml",
+                "url" to "jdbc:sqlite:app/my_database.db",
+                "username" to "username",
+                "password" to "password"
+            )
+        }
+    }
+}
+
+jooq {
+    version.set("3.19.15") // Set the jOOQ version
+    configurations {
+        create("main") { // Create a configuration named "main"
+            generateSchemaSourceOnCompilation.set(true) // Optional: Generate sources on compilation
+            jooqConfiguration.apply {
+                jdbc.apply {
+                    driver = "org.sqlite.JDBC"
+                    url = "jdbc:sqlite:my_database.db"
+                    user = "username"
+                    password = "password"
+                }
+                generator.apply {
+                    name = "org.jooq.codegen.KotlinGenerator"
+                    database.apply {
+                        name = "org.jooq.meta.sqlite.SQLiteDatabase"
+                        includes = ".*"
+                    }
+                    target.apply {
+                        packageName = "jooq.generated"
+                        directory = layout.buildDirectory.dir("jooq").get().asFile.absolutePath
+                    }
+                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                }
+            }
+        }
+    }
+}
+
 dependencies {
+    liquibaseRuntime("org.liquibase:liquibase-core:4.24.0")
+    liquibaseRuntime("org.yaml:snakeyaml:1.33")
+    liquibaseRuntime("org.xerial:sqlite-jdbc:3.42.0.0")
+    liquibaseRuntime("info.picocli:picocli:4.7.5")
+    jooqGenerator("org.xerial:sqlite-jdbc:3.42.0.0")
     // This dependency is used by the application.
     implementation(libs.guava)
     implementation("org.xerial:sqlite-jdbc:3.42.0.0")
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.7")
+    implementation("org.jooq:jooq:3.20.1")
 }
 
 testing {

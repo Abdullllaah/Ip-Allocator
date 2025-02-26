@@ -1,7 +1,13 @@
 import IpAllocator.IpAllocationType.SEQUENTIAL
+import org.jooq.impl.DSL
+import java.sql.DriverManager
+import jooq.generated.tables.references.*
 
 /** A class that acts like a registry*/
 object Registry : GrpcApi() {
+
+    val connection = DriverManager.getConnection("jdbc:sqlite:app/my_database.db")
+    val dsl = DSL.using(connection)
 
     /** Print the lists for testing */
     fun viewAll() {
@@ -16,11 +22,17 @@ object Registry : GrpcApi() {
      * @return [TargetType] The type of the ip of class TargetType
      */
     private fun determineTargetType(ipInfo: IpInformation): TargetType {
-        require(DB.clientsIPsAndPorts.containsKey(ipInfo.ip) || DB.serversIPsAndPorts.containsKey(ipInfo.ip))
-            { "IP ${ipInfo.ip} not found" }
+        val clientsIps = dsl.selectFrom(CLIENTS_IPS).fetch(CLIENTS_IPS.IP)
+        val serversIps = dsl.selectFrom(SERVERS_IPS).fetch(SERVERS_IPS.IP)
+        require(clientsIps.contains(ipInfo.ip) || serversIps.contains(ipInfo.ip))
+        { "IP ${ipInfo.ip} not found" }
 
-        return if (DB.clientsIPsAndPorts.containsKey(ipInfo.ip)) TargetType(ClientTargetType.CLIENT)
+        return if (clientsIps.contains(ipInfo.ip)) TargetType(ClientTargetType.CLIENT)
         else TargetType(ClientTargetType.SERVER)
+    }
+
+    fun main() {
+        println(determineTargetType(IpInformation("1", 0u)))
     }
 
     override fun secureIp(targetType: TargetType): IpInformation {

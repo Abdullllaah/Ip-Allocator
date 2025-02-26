@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-clients-tables
+      author: abdullah
+      changes:
+        - createTable:
+            tableName: clients
+            columns:
+              - column:
+                  name: ip
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: service_id
+                  type: int
+                  constraints:
+                    primaryKey: true
+        - createTable:
+           tableName: clients_info
+           columns:
+             - column:
+                 name: ip
+                 type: varchar(255)
+                 constraints:
+                   primaryKey: true
+        - createTable:
+            tableName: clients_ips
+            columns:
+              - column:
+                  name: ip
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: port
+                  type: int
+                  defaultValue: 0
+              - column:
+                  name: allocated
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: date
+                  type: timestamp
+                  constraints:
+                    nullable: true
