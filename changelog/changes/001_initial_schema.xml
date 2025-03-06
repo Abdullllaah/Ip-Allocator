@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="initial-schema" author="abdullah">
+        <createTable tableName="config">
+            <column name="life_time_sec" type="int"/>
+        </createTable>
+
+        <createTable tableName="servers_ips">
+            <column name="ip" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="allocated" type="boolean" defaultValueBoolean="false"/>
+            <column name="date" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="servers">
+            <column name="ip" type="varchar(255)">
+                <constraints primaryKey="true" foreignKeyName="fk__servers__servers_ips" references="servers_ips(ip)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="services">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="port" type="int"/>
+            <column name="ip" type="varchar(255)">
+                <constraints foreignKeyName="fk__services__servers" references="servers(ip)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="servers_services">
+            <column name="server_ip" type="varchar(255)">
+                <constraints primaryKey="true" foreignKeyName="fk__servers_services__servers" references="servers(ip)"/>
+            </column>
+            <column name="service_id" type="int">
+                <constraints primaryKey="true" foreignKeyName="fk__servers_services__services" references="services(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -90,6 +90,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.3")
     implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.7")
     implementation("org.jooq:jooq:3.20.1")
+    implementation ("com.zaxxer:HikariCP:6.2.1")
 }
 
 testing {

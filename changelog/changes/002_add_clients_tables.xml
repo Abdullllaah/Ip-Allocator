@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="add-clients-tables" author="abdullah">
+        <createTable tableName="clients">
+            <column name="ip" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="service_id" type="int">
+                <constraints primaryKey="true" foreignKeyName="fk__clients__services" references="services(id)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="clients_ips">
+            <column name="ip" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="port" type="int" defaultValue="0"/>
+            <column name="allocated" type="boolean" defaultValueBoolean="false"/>
+            <column name="date" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="clients_info">
+            <column name="ip" type="varchar(255)">
+                <constraints primaryKey="true" foreignKeyName="fk__clients_info__clients_ips" references="clients_ips(ip)"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

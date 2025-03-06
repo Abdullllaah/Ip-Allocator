@@ -1,88 +1,58 @@
-//fun main() {
-//    val registry = Registry
-//
-//    // Test: Secure IP for a client
-//    println("### Securing IP for Client ###")
-//    val clientIp1 = registry.secureIp(TargetType(ClientTargetType.CLIENT))
-//    println("Secured Client IP: $clientIp1")
-//
-//    val clientIp2 = registry.secureIp(TargetType(ClientTargetType.CLIENT))
-//    println("Secured Client IP: $clientIp2")
-//
-//    // Test: Secure IP for a server
-//    println("\n### Securing IP for Server ###")
-//    val serverIp1 = registry.secureIp(TargetType(ClientTargetType.SERVER))
-//    println("Secured Server IP: $serverIp1")
-//
-//    // Test: Secure Port for a Server IP
-//    println("\n### Securing 2 Ports sequentially for Server ###")
-//    val securedPortServer1 = registry.securePort(serverIp1)
-//    val securedPortServer2 = registry.securePort(serverIp1)
-//    println("Secured Port for Server IP: $securedPortServer1, $securedPortServer2")
-//
-//    // Test: Secure IP and Port together
-//    println("\n### Securing IP and Port Together ###")
-//    val securedIpAndPort = registry.SecureIpAndPort(TargetType(ClientTargetType.SERVER))
-//    println("Secured IP and Port: $securedIpAndPort")
-//
-//    // Test: Free Port
-//    println("\n### Freeing a Port ###")
-//    registry.FreePort(securedPortServer1)
-//    println("Port 1 Freed for Server IP: ${securedPortServer1.ip}")
-//    registry.viewAll() // View all to verify
-//
-//    // Test: Free IP and All Ports
-//    println("\n### Freeing an IP and All Ports ###")
-//    registry.FreeIpAndAllPorts(serverIp1)
-//    println("Freed IP and All Ports for: ${serverIp1.ip}")
-//    registry.viewAll() // View all to verify
-//
-//    // View Final State
-//    println("\n### Final State of DB ###")
-//    registry.viewAll()
-//}
 import jooq.generated.tables.references.*
 import org.jooq.impl.DSL.*
 import org.jooq.impl.DSL
 import java.sql.DriverManager
 
 fun main() {
-    val connection = DriverManager.getConnection("jdbc:sqlite:app/my_database.db")
-    val dsl = DSL.using(connection)
 
-//    dsl.insertInto(CLIENTS_IPS, CLIENTS_IPS.IP, CLIENTS_IPS.PORT)
+//    Connect.dsl.insertInto(CLIENTS_IPS, CLIENTS_IPS.IP, CLIENTS_IPS.PORT)
 //        .values("1", 0)
 //        .execute()
 
-//    Admin.allocateIps(Segment("10.10.10.0", "10.10.10.10"), ClientTargetType.CLIENT)
+//    Admin.allocateIps(Segment("2.2.2.0", "2.2.2.1"), ClientTargetType.SERVER)
+//    Admin.allocateIps(Segment("1.1.1.10", "1.1.1.20"), ClientTargetType.CLIENT)
+//    Registry.secureIp(TargetType(ClientTargetType.SERVER))
+//    Registry.securePort(IpInformation("2.2.2.0", 0u))
+//    Registry.securePort(IpInformation("1.1.1.10", 0u))
+//    Registry.secureIp(TargetType(ClientTargetType.SERVER))
+//    Registry.secureIp(TargetType(ClientTargetType.CLIENT))
+//    Registry.FreePort(IpInformation("1.1.1.10", 49152u))
+//    Registry.FreeIpAndAllPorts(IpInformation("2.2.2.0", 0u))
+//    Admin.freeExpiredIps()
 
-//    println(Registry.secureIp(TargetType(ClientTargetType.SERVER)))
+//    Connect.dsl
+//        .insertInto(CONFIG, CONFIG.LIFE_TIME_SEC)
+//        .values(2)
+//        .execute()
 
-//    dsl.insertInto(SERVICES, SERVICES.IP, SERVICES.PORT)
+//    println(Registry.secureIp(TargetType(ClientTargetType.CLIENT)))
+
+//    Connect.dsl.insertInto(SERVICES, SERVICES.IP, SERVICES.PORT)
 //        .values("20.20.200.10", 50_000)
 //        .execute()
 
-//    val result = dsl.select(max(SERVICES.PORT))
+//    val result = Connect.dsl.select(max(SERVICES.PORT))
 //        .from(SERVICES)
 //        .where(SERVICES.IP.eq("20.20.200.10"))
 //        .fetchOne()?.value1()
 
 
-//    dsl.insertInto(SERVICES, SERVICES.IP, SERVICES.PORT)
+//    Connect.dsl.insertInto(SERVICES, SERVICES.IP, SERVICES.PORT)
 //        .values("20.20.200.10", result?.plus(1))
 //        .execute()
 
 //    Registry.securePort(IpInformation("20.20.200.9", 0u))
 
-    Registry.secureIp(TargetType(ClientTargetType.CLIENT))
-    var result = dsl.selectFrom(CLIENTS_INFO).fetch()
-    println(result)
-    var res = dsl.selectFrom(CLIENTS_IPS).fetch()
-    println(res)
-    println(Admin.freeExpiredIps())
-    result = dsl.selectFrom(CLIENTS_INFO).fetch()
-    println(result)
-    res = dsl.selectFrom(CLIENTS_IPS).fetch()
-    println(res)
+//    Registry.secureIp(TargetType(ClientTargetType.CLIENT))
+//    var result = Connect.dsl.selectFrom(SERVERS).fetch()
+//    println(result)
+//    var res = Connect.dsl.selectFrom(CLIENTS_IPS).fetch()
+//    println(res)
+//    println(Admin.freeExpiredIps())
+//    result = Connect.dsl.selectFrom(CLIENTS_INFO).fetch()
+//    println(result)
+//    res = Connect.dsl.selectFrom(CLIENTS_IPS).fetch()
+//    println(res)
+//    Registry.securePort(IpInformation("2.2.2.0", 0u))
 }
 
