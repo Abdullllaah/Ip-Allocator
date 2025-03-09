@@ -14,7 +14,7 @@
                 <constraints primaryKey="true"/>
             </column>
             <column name="allocated" type="boolean" defaultValueBoolean="false"/>
-            <column name="date" type="datetime">
+            <column name="date" type="timestamp">
                 <constraints nullable="true"/>
             </column>
         </createTable>

@@ -20,7 +20,7 @@
             </column>
             <column name="port" type="int" defaultValue="0"/>
             <column name="allocated" type="boolean" defaultValueBoolean="false"/>
-            <column name="date" type="datetime">
+            <column name="date" type="timestamp">
                 <constraints nullable="true"/>
             </column>
         </createTable>

@@ -1,5 +1,9 @@
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jooq.generated.tables.references.*
+import org.jooq.DatePart
+import org.jooq.impl.DSL.currentLocalDateTime
+import org.jooq.impl.DSL.localDateTimeSub
+import java.time.LocalDateTime
 
 /** An object that handles the database through the admin registry*/
 object Admin {
@@ -53,8 +57,8 @@ object Admin {
             val expiredClientIps = ctx.dsl().update(CLIENTS_IPS)
                 .set(CLIENTS_IPS.PORT, 0)
                 .set(CLIENTS_IPS.ALLOCATED, false)
-                .set(CLIENTS_IPS.DATE, null as String?)
-                .where(CLIENTS_IPS.DATE.isNotNull)
+                .set(CLIENTS_IPS.DATE, null as LocalDateTime?)
+                .where(CLIENTS_IPS.DATE.lt(localDateTimeSub(currentLocalDateTime(), lifeTimeSec, DatePart.SECOND)))
                 .returningResult()
                 .fetch(CLIENTS_IPS.IP)
 
@@ -70,8 +74,8 @@ object Admin {
         Connect.dsl.transaction { ctx ->
             val expiredServersIps = ctx.dsl().update(SERVERS_IPS)
                 .set(SERVERS_IPS.ALLOCATED, false)
-                .set(SERVERS_IPS.DATE, null as String?)
-                .where(SERVERS_IPS.DATE.isNotNull)
+                .set(SERVERS_IPS.DATE, null as LocalDateTime?)
+                .where(CLIENTS_IPS.DATE.lt(localDateTimeSub(currentLocalDateTime(), lifeTimeSec, DatePart.SECOND)))
                 .returningResult()
                 .fetch(SERVERS_IPS.IP)
 

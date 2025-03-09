@@ -65,6 +65,14 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.sqlite.SQLiteDatabase"
                         includes = ".*"
+                        forcedTypes.addAll(
+                            listOf(
+                                org.jooq.meta.jaxb.ForcedType()
+                                    .withName("TIMESTAMP")
+                                    .withIncludeTypes("(?i:TEXT)")
+                                    .withExpression(".*\\.date")
+                            )
+                        )
                     }
                     target.apply {
                         packageName = "jooq.generated"
