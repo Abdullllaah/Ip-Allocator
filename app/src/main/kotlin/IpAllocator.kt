@@ -2,8 +2,8 @@ import ClientTargetType.CLIENT
 import ClientTargetType.SERVER
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jooq.generated.tables.references.*
-import org.jooq.impl.DSL.count
-import org.jooq.impl.DSL.currentTimestamp
+import org.jooq.impl.DSL.*
+import java.time.LocalDateTime
 
 /** Handles ip address allocations */
 object IpAllocator {
@@ -50,7 +50,7 @@ object IpAllocator {
 
             ctx.dsl().update(SERVERS_IPS)
                 .set(SERVERS_IPS.ALLOCATED, true)
-                .set(SERVERS_IPS.DATE, currentTimestamp().cast(String::class.java))
+                .set(SERVERS_IPS.DATE, currentLocalDateTime())
                 .where(SERVERS_IPS.IP.eq(ip))
                 .execute()
 
@@ -79,7 +79,7 @@ object IpAllocator {
 
             ctx.dsl().update(CLIENTS_IPS)
                 .set(CLIENTS_IPS.ALLOCATED, true)
-                .set(CLIENTS_IPS.DATE, currentTimestamp().cast(String::class.java))
+                .set(CLIENTS_IPS.DATE, currentLocalDateTime())
                 .where(CLIENTS_IPS.IP.eq(ip))
                 .execute()
 
@@ -91,9 +91,9 @@ object IpAllocator {
             val service = ctx.dsl()
                 .select(SERVICES.ID)
                 .from(SERVICES)
-                .leftJoin(CLIENTS).on(SERVICES.ID.eq(CLIENTS.SERVICE_ID))
+                .leftJoin(SERVICES.clients())
                 .groupBy(SERVICES.ID)
-                .orderBy(count(CLIENTS.IP).asc())
+                .orderBy(count(SERVICES.clients().IP).asc())
                 .limit(1)
                 .fetchOne()
                 ?.value1()
@@ -116,7 +116,7 @@ object IpAllocator {
                 Connect.dsl.transaction { ctx ->
                     ctx.dsl().update(SERVERS_IPS)
                         .set(SERVERS_IPS.ALLOCATED, false)
-                        .set(SERVERS_IPS.DATE, null as String?)
+                        .set(SERVERS_IPS.DATE, null as LocalDateTime?)
                         .where(SERVERS_IPS.IP.eq(ipInfo.ip))
                         .returningResult()
                         .fetch(SERVERS_IPS.IP)
@@ -135,7 +135,7 @@ object IpAllocator {
                     ctx.dsl().update(CLIENTS_IPS)
                         .set(CLIENTS_IPS.PORT, 0)
                         .set(CLIENTS_IPS.ALLOCATED, false)
-                        .set(CLIENTS_IPS.DATE, null as String?)
+                        .set(CLIENTS_IPS.DATE, null as LocalDateTime?)
                         .where(CLIENTS_IPS.IP.eq(ipInfo.ip))
                         .returningResult()
                         .fetch(CLIENTS_IPS.IP)
